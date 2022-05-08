@@ -1,6 +1,22 @@
-use teloxide::{prelude::*, utils::command::BotCommands};
+use teloxide::{prelude::*, utils::command::{BotCommands, self}};
 
-use std::error::Error;
+use std::{error::Error, fmt::write, io::ErrorKind};
+
+
+#[derive(BotCommands, Clone)]
+#[command(rename = "lowercase", description = "These commands are supported:")]
+enum Command {
+    #[command(description = "display this text.")]
+    Help,
+    #[command(description = "log in")]
+    LogIn,
+    #[command(description = "get total balance")]
+    GetBalance(String),
+    #[command(description = "insert receipt from URL")]
+    InsertFromUrl(String),
+    #[command(description = "shut the bot down if you have the priviledges")]
+    ShutDown
+}
 
 #[tokio::main]
 async fn main() {
@@ -12,17 +28,6 @@ async fn main() {
     teloxide::commands_repl(bot, answer, Command::ty()).await;
 }
 
-#[derive(BotCommands, Clone)]
-#[command(rename = "lowercase", description = "These commands are supported:")]
-enum Command {
-    #[command(description = "display this text.")]
-    Help,
-    #[command(description = "handle a username.")]
-    Username(String),
-    #[command(description = "handle a username and an age.", parse_with = "split")]
-    UsernameAndAge(String, u8),
-}
-
 async fn answer(
     bot: AutoSend<Bot>,
     message: Message,
@@ -31,17 +36,11 @@ async fn answer(
     match command {
         Command::Help => {
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
-        }
-        Command::Username(username) => {
-            bot.send_message(message.chat.id, format!("Your username is @{username}. chat_id: {}", message.chat.id)).await?
-        }
-        Command::UsernameAndAge(username, age ) => {
-            bot.send_message(
-                message.chat.id,
-                format!("Your username is @{username} and age is {age}."),
-            )
-            .await?
-        }
+        },
+        Command::LogIn => login_handler(),
+        Command::GetBalance(month) => balance_handler(),
+        Command::InsertFromUrl(url) => url_handler(),
+        Command::ShutDown => return Err(Box::new(teloxide::ApiError::Unknown("Shutdown Request".to_owned())))
     };
 
     Ok(())
