@@ -1,6 +1,6 @@
-use teloxide::{prelude::*, utils::command::{BotCommands, self}};
+use teloxide::{prelude::*, utils::command::BotCommands};
 
-use std::{error::Error, fmt::write, io::ErrorKind};
+use std::error::Error;
 
 
 #[derive(BotCommands, Clone)]
@@ -28,7 +28,7 @@ async fn main() {
     teloxide::commands_repl(bot, answer, Command::ty()).await;
 }
 
-async fn answer(
+async fn answer (
     bot: AutoSend<Bot>,
     message: Message,
     command: Command,
@@ -37,9 +37,15 @@ async fn answer(
         Command::Help => {
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
-        Command::LogIn => login_handler(),
-        Command::GetBalance(month) => balance_handler(),
-        Command::InsertFromUrl(url) => url_handler(),
+        Command::LogIn => {
+            //
+        },
+        Command::GetBalance(month) => {
+
+        },
+        Command::InsertFromUrl(url) => {
+
+        },
         Command::ShutDown => return Err(Box::new(teloxide::ApiError::Unknown("Shutdown Request".to_owned())))
     };
 
