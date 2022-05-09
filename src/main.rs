@@ -2,6 +2,8 @@ use teloxide::{prelude::*, utils::command::BotCommands};
 
 use std::error::Error;
 
+use receipt_bot::db_interface::*;
+
 
 #[derive(BotCommands, Clone)]
 #[command(rename = "lowercase", description = "These commands are supported:")]
@@ -38,7 +40,9 @@ async fn answer (
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
         Command::LogIn => {
-            bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
+            let con = establish_connection(&std::env::var("DATABASE_URL")?).expect("Error while connecting to db");
+            let res = get_users(&con).expect("Could not fetch query!");
+            bot.send_message(message.chat.id, format!("Users:\n{:?}", res)).await?
         },
         Command::GetBalance(month) => {
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
