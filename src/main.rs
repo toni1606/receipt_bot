@@ -38,13 +38,13 @@ async fn answer (
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
         Command::LogIn => {
-            //
+            bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
         Command::GetBalance(month) => {
-
+            bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
         Command::InsertFromUrl(url) => {
-
+            bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
         Command::ShutDown => return Err(Box::new(teloxide::ApiError::Unknown("Shutdown Request".to_owned())))
     };
