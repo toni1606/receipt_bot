@@ -42,7 +42,8 @@ async fn answer (
         Command::LogIn => {
             let con = establish_connection(&std::env::var("DATABASE_URL")?).expect("Error while connecting to db");
             let res = get_users(&con).expect("Could not fetch query!");
-            bot.send_message(message.chat.id, format!("Users:\n{:?}", res)).await?
+
+            bot.send_message(message.chat.id, format!("User:\n{:?}", res)).await?
         },
         Command::GetBalance(month) => {
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
