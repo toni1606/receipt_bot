@@ -35,15 +35,22 @@ async fn answer (
     message: Message,
     command: Command,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
+    let con = Database::connect(&std::env::var("DATABASE_URL")?).expect("Error while connecting to db");
+
     match command {
         Command::Help => {
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
         Command::LogIn => {
-            let con = Database::connect(&std::env::var("DATABASE_URL")?).expect("Error while connecting to db");
             let res = con.get_user(message.chat.id.to_string().parse().unwrap()).expect("Could not fetch query!");
+            
+            let mut msg = "Logged in!";
+            if res.len() == 0 {
+                con.insert_user(message.chat.id.to_string().parse().unwrap(), false).expect("Could not insert user");                
+                msg = "User created!\nWelcome";
+            }
 
-            bot.send_message(message.chat.id, format!("User {}:\n{:?}", message.chat.id, res)).await?
+            bot.send_message(message.chat.id, msg).await?
         },
         Command::GetBalance(month) => {
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
