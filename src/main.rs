@@ -40,8 +40,8 @@ async fn answer (
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
         Command::LogIn => {
-            let con = establish_connection(&std::env::var("DATABASE_URL")?).expect("Error while connecting to db");
-            let res = get_users(&con).expect("Could not fetch query!");
+            let con = Database::connect(&std::env::var("DATABASE_URL")?).expect("Error while connecting to db");
+            let res = con.get_users().expect("Could not fetch query!");
 
             bot.send_message(message.chat.id, format!("User:\n{:?}", res)).await?
         },
