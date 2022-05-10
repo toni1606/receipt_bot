@@ -10,8 +10,8 @@ use receipt_bot::db_interface::*;
 enum Command {
     #[command(description = "display this text.")]
     Help,
-    #[command(description = "log in")]
-    LogIn,
+    #[command(description = "register the user")]
+    Register,
     #[command(description = "get total balance")]
     GetBalance(String),
     #[command(description = "insert receipt from URL")]
@@ -41,10 +41,10 @@ async fn answer (
         Command::Help => {
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
-        Command::LogIn => {
+        Command::Register => {
             let res = con.get_user(message.chat.id.to_string().parse().unwrap()).expect("Could not fetch query!");
             
-            let mut msg = "Logged in!";
+            let mut msg = "User already in the database!";
             if res.len() == 0 {
                 con.insert_user(message.chat.id.to_string().parse().unwrap(), false).expect("Could not insert user");                
                 msg = "User created!\nWelcome";
