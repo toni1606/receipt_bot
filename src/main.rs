@@ -36,12 +36,14 @@ async fn answer (
     command: Command,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     let con = Database::connect(&std::env::var("DATABASE_URL")?).expect("Error while connecting to db");
+    log::debug!("Connected to Database");
 
     match command {
         Command::Help => {
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
         Command::Register => {
+            log::info!("Register command run");
             let res = con.get_user(message.chat.id.to_string().parse().unwrap()).expect("Could not fetch query!");
             
             let mut msg = "User already in the database!";
@@ -50,6 +52,7 @@ async fn answer (
                 msg = "User created!\nWelcome";
             }
 
+            log::info!("Preparing to send: '{}'", msg);
             bot.send_message(message.chat.id, msg).await?
         },
         Command::GetBalance(month) => {
@@ -58,7 +61,17 @@ async fn answer (
         Command::InsertFromUrl(url) => {
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
-        Command::ShutDown => return Err(Box::new(teloxide::ApiError::Unknown("Shutdown Request".to_owned())))
+        Command::ShutDown => {
+            log::info!("ShutDown command run");
+            let res = con.get_user(message.chat.id.to_string().parse().unwrap()).expect("Could not run query!");
+
+            if res.get(0).is_some() && res[0].is_admin.unwrap_or(false) {
+                log::info!("Shutting down");
+                std::process::exit(0);
+            }
+
+            bot.send_message(message.chat.id, "You are not a admin!!!").await?
+        }       
     };
 
     Ok(())
