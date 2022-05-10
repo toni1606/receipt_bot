@@ -18,7 +18,8 @@ impl Database {
         user::table.load::<User>(&self.connection)
     }
 
-    pub fn get_user(&self, id: i64) -> User {
-        unimplemented!()
+    pub fn get_user(&self, id: i64) -> QueryResult<Vec<User>> {
+        user::table.filter(user::user_id.eq(id))
+                   .load::<User>(&self.connection)
     }
 }
