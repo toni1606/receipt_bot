@@ -67,6 +67,7 @@ async fn answer (
 
             if res.get(0).is_some() && res[0].is_admin.unwrap_or(false) {
                 log::info!("Shutting down");
+                bot.send_message(message.chat.id, "Shutting down...").await?;
                 std::process::exit(0);
             }
 
