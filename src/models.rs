@@ -76,7 +76,9 @@ impl Default for Receipt {
 
 impl Display for Receipt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, r"Receipt {{
+        write!(
+            f,
+            r"Receipt {{
     nslf: {},
     nivf: {},
     value_before_tvsh: {:?},
@@ -91,6 +93,21 @@ impl Display for Receipt {
     business_id: {}.
     operator_id: {},
     user_id: {}
-}}", self.nslf, self.nivf, self.value_before_tvsh, self.tvsh, self.value, self.location, self.release_date, self.receipt_type, self.sw_code, self.payment_deadline, self.status, self.business_id, self.operator_id, self.user_id)
+}}",
+            self.nslf,
+            self.nivf,
+            self.value_before_tvsh,
+            self.tvsh,
+            self.value,
+            self.location,
+            self.release_date,
+            self.receipt_type,
+            self.sw_code,
+            self.payment_deadline,
+            self.status,
+            self.business_id,
+            self.operator_id,
+            self.user_id
+        )
     }
 }
