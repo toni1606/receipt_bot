@@ -122,7 +122,7 @@ async fn get_receipt_from_url(driver: &WebDriver) -> WebDriverResult<Receipt> {
         .trim()
         .parse()
         .unwrap();
-    let tvsh: Option<f64> = match tvsh.replace("&nbsp;", "").replace(" LEK", "").parse() {
+    let tvsh: Option<f64> = match tvsh.replace("&nbsp;", "").replace(" LEK", "").replace(",", ".").trim().parse() {
         Ok(o) => Some(o),
         Err(_) => None,
     };
