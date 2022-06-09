@@ -3,28 +3,34 @@ use thirtyfour::prelude::*;
 
 use crate::models::Receipt;
 
-pub async fn get_html(url: &str) -> WebDriverResult<Receipt> {
+pub async fn scraper(url: &str) -> WebDriverResult<Receipt> {
     let caps = DesiredCapabilities::firefox();
     let driver = WebDriver::new("http://localhost:4444", caps).await?;
+
+    log::info!("Started WebDriver");
 
     driver.get(url).await?;
 
     driver.find_element(By::Tag("script")).await?;
 
-    println!("{}", driver.title().await?);
-
     while let Err(_) = driver.find_element(By::ClassName("invoice-items")).await {
         std::thread::sleep(std::time::Duration::from_secs(1));
     }
 
-    let ret = get_receipt_from_url(&driver).await?;
+    log::info!("Page loaded HTML elements");
+
+    let ret = scrape_receipt(&driver).await?;
+
+    log::info!("Scraped Receipt from Website");
 
     driver.quit().await?;
+
+    log::info!("Closed WebDriver");
 
     Ok(ret)
 }
 
-async fn get_receipt_from_url(driver: &WebDriver) -> WebDriverResult<Receipt> {
+async fn scrape_receipt(driver: &WebDriver) -> WebDriverResult<Receipt> {
     let invoice_header = driver.find_element(By::ClassName("invoice-amount")).await?;
     let invoice_details = driver.find_element(By::ClassName("panel-body")).await?;
 

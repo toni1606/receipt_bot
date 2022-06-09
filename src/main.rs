@@ -2,7 +2,7 @@ use teloxide::{prelude::*, utils::command::BotCommands};
 
 use std::error::Error;
 
-use receipt_bot::{db_interface::*, web_scraper::get_html};
+use receipt_bot::{db_interface::*, web_scraper::scraper};
 
 #[derive(BotCommands, Clone)]
 #[command(rename = "lowercase", description = "These commands are supported:")]
@@ -58,16 +58,20 @@ async fn answer(
                 msg = "User created!\nWelcome";
             }
 
+            let tmp = bot.send_message(message.chat.id, msg).await?;
             log::info!("Preparing to send: '{}'", msg);
-            bot.send_message(message.chat.id, msg).await?
+            tmp
         }
         Command::GetBalance(month) => {
             bot.send_message(message.chat.id, Command::descriptions().to_string())
                 .await?
         }
         Command::InsertFromUrl(url) => {
-            let html = get_html(&url).await?;
-            bot.send_message(message.chat.id, format!("{html}")).await?
+            let scraper = scraper(&url).await?;
+
+            let a = bot.send_message(message.chat.id, format!("{scraper}")).await?;
+            log::info!("Sent Receipt back");
+            a
         }
         Command::ShutDown => {
             log::info!("ShutDown command run");
@@ -81,7 +85,8 @@ async fn answer(
                     .await?;
                 std::process::exit(0);
             }
-
+            
+            log::warn!("Not admin tried to shutdown, {}", message.chat.id.to_string());
             bot.send_message(message.chat.id, "You are not a admin!!!")
                 .await?
         }
