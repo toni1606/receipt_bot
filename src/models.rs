@@ -7,7 +7,7 @@ use std::fmt::Display;
 
 use chrono::NaiveDateTime;
 
-use crate::schema::receipt::{value_before_tvsh, payment_deadline};
+use crate::schema::receipt::{payment_deadline, value_before_tvsh};
 #[derive(Queryable, Debug)]
 // #[primary_key(company_id)]
 // #[table_name = "Company"]
