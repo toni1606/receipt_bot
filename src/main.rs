@@ -2,7 +2,7 @@ use teloxide::{prelude::*, utils::command::BotCommands};
 
 use std::error::Error;
 
-use receipt_bot::db_interface::*;
+use receipt_bot::{db_interface::*, web_scraper::get_html};
 
 
 #[derive(BotCommands, Clone)]
@@ -35,7 +35,7 @@ async fn answer (
     message: Message,
     command: Command,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    let con = Database::connect(&std::env::var("DATABASE_URL")?).expect("Error while connecting to db");
+    let con = Database::connect("mysql://toniguli:!Insy_2021$@htl-projekt.com:3306/2022_4ay_toniguli_receipt").expect("Error while connecting to db");
     log::debug!("Connected to Database");
 
     match command {
@@ -59,7 +59,8 @@ async fn answer (
             bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
         },
         Command::InsertFromUrl(url) => {
-            bot.send_message(message.chat.id, Command::descriptions().to_string()).await?
+            let html = get_html(&url).await?;
+            bot.send_message(message.chat.id, html).await?
         },
         Command::ShutDown => {
             log::info!("ShutDown command run");
