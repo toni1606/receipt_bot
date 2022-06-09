@@ -3,7 +3,6 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 
-
 use chrono::NaiveDateTime;
 #[derive(Queryable, Debug)]
 // #[primary_key(company_id)]
@@ -52,10 +51,23 @@ pub struct User {
     pub is_admin: Option<bool>,
 }
 
-
-
 impl Default for Receipt {
     fn default() -> Self {
-        Receipt { nslf: "".to_string(), nivf: "".to_string(), value_before_tvsh: Some(0.0), tvsh: Some(0.0), value: 0.0, location: Some("".to_string()), release_date: NaiveDateTime::from_timestamp(0, 0), receipt_type: Some("".to_string()), sw_code: Some("".to_string()), payment_deadline: Some(NaiveDateTime::from_timestamp(0, 0)), status: Some("".to_string()), business_id: "".to_string(), operator_id: "".to_string(), user_id: 0 }
+        Receipt {
+            nslf: "".to_string(),
+            nivf: "".to_string(),
+            value_before_tvsh: Some(0.0),
+            tvsh: Some(0.0),
+            value: 0.0,
+            location: Some("".to_string()),
+            release_date: NaiveDateTime::from_timestamp(0, 0),
+            receipt_type: Some("".to_string()),
+            sw_code: Some("".to_string()),
+            payment_deadline: Some(NaiveDateTime::from_timestamp(0, 0)),
+            status: Some("".to_string()),
+            business_id: "".to_string(),
+            operator_id: "".to_string(),
+            user_id: 0,
+        }
     }
 }

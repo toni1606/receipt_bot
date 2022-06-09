@@ -46,9 +46,4 @@ joinable!(receipt -> company (business_id));
 joinable!(receipt -> employee (operator_id));
 joinable!(receipt -> user (user_id));
 
-allow_tables_to_appear_in_same_query!(
-    company,
-    employee,
-    receipt,
-    user,
-);
+allow_tables_to_appear_in_same_query!(company, employee, receipt, user,);
