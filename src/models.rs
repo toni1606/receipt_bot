@@ -3,6 +3,8 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 
+use std::fmt::Display;
+
 use chrono::NaiveDateTime;
 #[derive(Queryable, Debug)]
 // #[primary_key(company_id)]
@@ -69,5 +71,26 @@ impl Default for Receipt {
             operator_id: "".to_string(),
             user_id: 0,
         }
+    }
+}
+
+impl Display for Receipt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, r"Receipt {{
+    nslf: {},
+    nivf: {},
+    value_before_tvsh: {:?},
+    tvsh: {:?},
+    value: {},
+    location: {:?},
+    release_date: {},
+    receipt_type: {},
+    sw_code: {:?},
+    payment_deadline: {:?},
+    status: {:?},
+    business_id: {}.
+    operator_id: {},
+    user_id: {}
+}}", self.nslf, self.nivf, self.value_before_tvsh, self.tvsh, self.value, self.location, self.release_date, self.receipt_type, self.sw_code, self.payment_deadline, self.status, self.business_id, self.operator_id, self.user_id)
     }
 }

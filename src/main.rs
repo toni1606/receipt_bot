@@ -67,7 +67,7 @@ async fn answer(
         }
         Command::InsertFromUrl(url) => {
             let html = get_html(&url).await?;
-            bot.send_message(message.chat.id, html.nslf).await?
+            bot.send_message(message.chat.id, format!("{html}")).await?
         }
         Command::ShutDown => {
             log::info!("ShutDown command run");
