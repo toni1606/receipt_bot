@@ -86,7 +86,7 @@ impl Display for Receipt {
     value: {},
     location: {:?},
     release_date: {},
-    receipt_type: {},
+    receipt_type: {:?},
     sw_code: {:?},
     payment_deadline: {:?},
     status: {:?},

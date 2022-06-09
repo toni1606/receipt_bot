@@ -7,10 +7,8 @@ pub async fn get_html(url: &str) -> WebDriverResult<Receipt> {
     let caps = DesiredCapabilities::firefox();
     let driver = WebDriver::new("http://localhost:4444", caps).await?;
 
-    // Navigate to https://wikipedia.org.
     driver.get(url).await?;
 
-    // Look for header to implicitly wait for the page to load.
     driver.find_element(By::Tag("script")).await?;
 
     println!("{}", driver.title().await?);
@@ -29,7 +27,6 @@ pub async fn get_html(url: &str) -> WebDriverResult<Receipt> {
         .html(true)
         .await?;
 
-    // Always explicitly close the browser. There are no async destructors.
     driver.quit().await?;
 
     Ok(Receipt {
@@ -38,7 +35,18 @@ pub async fn get_html(url: &str) -> WebDriverResult<Receipt> {
     })
 }
 
-// pub fn get_receipt_from_url(html: &str) -> Receipt {
-//     let fragment = Html::parse_fragment(html);
-//     unimplemented!();
-// }
+async pub fn get_receipt_from_url(driver: &WebDriver) -> Receipt {
+    let invoice_header = driver
+        .find_element(By::ClassName("invoice-amount"))
+        .await?;
+
+    let value = invoice_header.find_element(By::Tag("h1"))
+        .await?
+        .find_element(By::Tag("strong"))
+        .await?
+        .html(true)
+        .await?;
+    
+    let tvsh = invoice_header.find_element(By::XPath("/small[2]")).await?.html(true).await?;
+    
+}
