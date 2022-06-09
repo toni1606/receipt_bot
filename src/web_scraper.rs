@@ -30,9 +30,7 @@ async fn get_receipt_from_url(driver: &WebDriver) -> WebDriverResult<Receipt> {
     let invoice_header = driver
         .find_element(By::ClassName("invoice-amount"))
         .await?;
-    let value = invoice_header.find_element(By::Tag("h1"))
-        .await?
-        .find_element(By::Tag("strong"))
+    let value = invoice_header.find_element(By::XPath("//h1/strong"))
         .await?
         .html(true)
         .await?;
