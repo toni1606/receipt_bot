@@ -1,9 +1,9 @@
 use std::str::FromStr;
 
-use chrono::NaiveDateTime;
+use chrono::{NaiveDateTime, NaiveDate};
 use thirtyfour::prelude::*;
 
-use crate::{models::Receipt, schema::receipt::{business_id, nivf}};
+use crate::models::Receipt;
 
 pub async fn get_html(url: &str) -> WebDriverResult<Receipt> {
     let caps = DesiredCapabilities::firefox();
@@ -40,12 +40,13 @@ async fn get_receipt_from_url(driver: &WebDriver) -> WebDriverResult<Receipt> {
     ));
     
     // invoice-details fields
-    let bus_id = invoice_details.find_element(By::XPath("//div[@class='form-group form-column'][2]/p")).await?.html(true).await?;
+    let business_id = invoice_details.find_element(By::XPath("//div[@class='form-group form-column'][2]/p")).await?.html(true).await?;
     let nslf = invoice_details.find_element(By::XPath("//div[3]/p")).await?.html(true).await?;
-    let _nivf = invoice_details.find_element(By::XPath("//div[4]/p")).await?.html(true).await?;
+    let nivf = invoice_details.find_element(By::XPath("//div[4]/p")).await?.html(true).await?;
     let receipt_type = Some(invoice_details.find_element(By::XPath("//div[5]/p")).await?.html(true).await?);
-    let op_id = invoice_details.find_element(By::XPath("//div[6]/p")).await?.html(true).await?;
-    let op_id = invoice_details.find_element(By::XPath("//div[6]/p")).await?.html(true).await?;
+    let operator_id = invoice_details.find_element(By::XPath("//div[6]/p")).await?.html(true).await?;
+    let sw_code = Some(invoice_details.find_element(By::XPath("//div[7]/p")).await?.html(true).await?);
+    let payment_deadline: Option<NaiveDateTime> = Some(NaiveDate::parse_from_str(&invoice_details.find_element(By::XPath("//div[8]/p")).await?.html(true).await?, "%d/%m/%Y").unwrap().and_hms(0, 0, 0));
 
     
 
@@ -63,9 +64,13 @@ async fn get_receipt_from_url(driver: &WebDriver) -> WebDriverResult<Receipt> {
         release_date,
         value_before_tvsh,
         location,
-        business_id: bus_id,
+        business_id,
         nslf,
-        nivf: _nivf,
+        nivf,
+        receipt_type,
+        operator_id,
+        sw_code,
+        payment_deadline,
         ..Default::default()
     })
 }
