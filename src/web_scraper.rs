@@ -107,6 +107,13 @@ async fn get_receipt_from_url(driver: &WebDriver) -> WebDriverResult<Receipt> {
         .unwrap()
         .and_hms(0, 0, 0),
     );
+    let status = Some(
+        invoice_details
+            .find_element(By::XPath("//div[9]/div/p"))
+            .await?
+            .html(true)
+            .await?,
+    );
 
     let value: f64 = value
         .replace("&nbsp;", "")
@@ -142,6 +149,7 @@ async fn get_receipt_from_url(driver: &WebDriver) -> WebDriverResult<Receipt> {
         operator_id,
         sw_code,
         payment_deadline,
+        status,
         ..Default::default()
     })
 }
