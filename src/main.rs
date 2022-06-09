@@ -35,7 +35,7 @@ async fn answer(
     command: Command,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     let con = Database::connect(
-        "mysql://toniguli:!Insy_2021$@htl-projekt.com:3306/2022_4ay_toniguli_receipt",
+        &std::env::var("DATABASE_URL")?,
     )
     .expect("Error while connecting to db");
     log::debug!("Connected to Database");

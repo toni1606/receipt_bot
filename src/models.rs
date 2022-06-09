@@ -6,6 +6,8 @@
 use std::fmt::Display;
 
 use chrono::NaiveDateTime;
+
+use crate::schema::receipt::{value_before_tvsh, payment_deadline};
 #[derive(Queryable, Debug)]
 // #[primary_key(company_id)]
 // #[table_name = "Company"]
