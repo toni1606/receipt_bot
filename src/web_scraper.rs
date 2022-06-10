@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use chrono::{NaiveDate, NaiveDateTime};
 use thirtyfour::prelude::*;
 
@@ -212,5 +214,21 @@ impl Scraper {
             location,
             name
         })
+    }
+}
+
+impl Display for Scraper {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            r"Scraper {{
+    receipt: {},
+    comp: {},
+    emp: {}
+}}",
+            self.receipt,
+            self.comp,
+            self.emp 
+        )
     }
 }
