@@ -26,14 +26,14 @@ impl Scraper {
 
         log::info!("Page loaded HTML elements");
 
-        let mut ret = Self::scrape_receipt(&driver).await?;
-        ret.user_id = user_id;
+        let mut receipt = Self::scrape_receipt(&driver).await?;
+        receipt.user_id = user_id;
         log::info!("Scraped Receipt");
 
         let comp = Self::scrape_company(&driver).await?;
         log::info!("Scraped Company");
 
-        let emp = Employee { emp_code: ret.operator_id.clone(), comp_id: comp.company_id.clone() };
+        let emp = Employee { emp_code: receipt.operator_id.clone(), comp_id: comp.company_id.clone() };
         log::info!("Scraped Employee");
         
         driver.quit().await?;
@@ -41,7 +41,7 @@ impl Scraper {
         log::info!("Closed WebDriver");
 
         Ok(Self {
-            receipt: ret,
+            receipt,
             comp,
             emp
         })

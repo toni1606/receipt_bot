@@ -113,3 +113,33 @@ impl Display for Receipt {
         )
     }
 }
+
+impl Display for Company {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            r"Company {{
+    company_id: {},
+    location: {:?},
+    name: {:?}
+}}",
+            self.company_id,
+            self.location,
+            self.name
+        )
+    }
+}
+
+impl Display for Employee {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            r"Employee {{
+    emp_code: {},
+    comp_id: {}
+}}",
+            self.emp_code,
+            self.comp_id
+        )
+    }
+}
