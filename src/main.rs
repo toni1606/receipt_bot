@@ -74,7 +74,7 @@ async fn answer(
             })).await?;
 
             let a = bot
-                .send_message(message.chat.id, format!("{}", scraper.receipt))
+                .send_message(message.chat.id, format!("{scraper}"))
                 .await?;
             log::info!("Sent Receipt back");
             a

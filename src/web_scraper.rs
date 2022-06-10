@@ -204,7 +204,7 @@ impl Scraper {
                 Err(_) => None
             };
         
-        let name = match invoice_header.find_element(By::XPath("//ul/li[1]")).await?.html(true).await {
+        let name = match invoice_header.find_element(By::XPath("//ul[@class='invoice-basic-info list-unstyled']/li[1]")).await?.html(true).await {
             Ok(e) => Some(e.replace("::before", "").replace(r#"""#, "").trim().to_owned()),
             Err(_) => None
         };
