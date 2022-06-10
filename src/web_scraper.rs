@@ -33,7 +33,7 @@ impl Scraper {
         let comp = Self::scrape_company(&driver).await?;
         log::info!("Scraped Company");
 
-        let emp = Self::scrape_employee(&driver).await?;
+        let emp = Employee { emp_code: ret.operator_id.clone(), comp_id: comp.company_id.clone() };
         log::info!("Scraped Employee");
         
         driver.quit().await?;
@@ -184,10 +184,33 @@ impl Scraper {
     }
 
     async fn scrape_company(driver: &WebDriver) -> WebDriverResult<Company> {
-        unimplemented!()
-    }
+        let invoice_details = driver.find_element(By::ClassName("panel-body")).await?;
+        let invoice_header = driver.find_element(By::ClassName("invoice-amount")).await?;
 
-    async fn scrape_employee(driver: &WebDriver) -> WebDriverResult<Employee> {
-        unimplemented!()
+        let company_id = invoice_details
+            .find_element(By::XPath("//div[@class='form-group form-column'][2]/p"))
+            .await?
+            .html(true)
+            .await?;
+        
+        let location = match invoice_details
+            .find_element(By::XPath("//div[@class='form-group form-column'][1]/p"))
+            .await?
+            .html(true)
+            .await {
+                Ok(e) => Some(e),
+                Err(_) => None
+            };
+        
+        let name = match invoice_header.find_element(By::XPath("//ul/li[1]")).await?.html(true).await {
+            Ok(e) => Some(e.replace("::before", "").replace(r#"""#, "").trim().to_owned()),
+            Err(_) => None
+        };
+
+        Ok(Company {
+            company_id,
+            location,
+            name
+        })
     }
 }
