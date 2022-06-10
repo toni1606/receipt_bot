@@ -1,8 +1,8 @@
 use teloxide::{prelude::*, utils::command::BotCommands};
 
-use std::error::Error;
+use std::{error::Error, iter::Scan};
 
-use receipt_bot::{db_interface::*, web_scraper::scraper};
+use receipt_bot::{db_interface::*, web_scraper::Scraper};
 
 #[derive(BotCommands, Clone)]
 #[command(rename = "lowercase", description = "These commands are supported:")]
@@ -68,9 +68,14 @@ async fn answer(
                 .await?
         }
         Command::InsertFromUrl(url) => {
-            let scraper = scraper(&url).await?;
+            let scraper = Scraper::new(&url, message.chat.id.to_string().parse().unwrap_or_else(|_|{
+                log::error!("message.chat.id () could not be parsed to i64");
+                0
+            })).await?;
 
-            let a = bot.send_message(message.chat.id, format!("{scraper}")).await?;
+            let a = bot
+                .send_message(message.chat.id, format!("{}", scraper.receipt))
+                .await?;
             log::info!("Sent Receipt back");
             a
         }
@@ -86,8 +91,11 @@ async fn answer(
                     .await?;
                 std::process::exit(0);
             }
-            
-            log::warn!("Not admin tried to shutdown, {}", message.chat.id.to_string());
+
+            log::warn!(
+                "Not admin tried to shutdown, {}",
+                message.chat.id.to_string()
+            );
             bot.send_message(message.chat.id, "You are not a admin!!!")
                 .await?
         }
