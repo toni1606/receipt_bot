@@ -42,6 +42,7 @@ async fn answer(
 
     match command {
         Command::Help => {
+            log::info!("Print help message");
             bot.send_message(message.chat.id, Command::descriptions().to_string())
                 .await?
         }
