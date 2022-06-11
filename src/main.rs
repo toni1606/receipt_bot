@@ -89,9 +89,12 @@ async fn answer(
             }
 
             let msg = match con.insert_receipt(scraper.receipt) {
-                Ok(_) => "Receipt added to database!",
-                Err(_) => {
-                    log::error!("Inserting receipt failed");
+                Ok(_) => {
+                    log::info!("Inserted Receipt in DB");
+                    "Receipt added to database!"
+                },
+                Err(e) => {
+                    log::error!("Could not insert Receipt in DB: {}", e);
                     "An error occured, and could not insert receipt :("
                 },
             };
