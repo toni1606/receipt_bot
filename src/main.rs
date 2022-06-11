@@ -40,6 +40,7 @@ async fn answer(
     .expect("Error while connecting to db");
     log::debug!("Connected to Database");
 
+    log::info!("Handling command");
     match command {
         Command::Help => {
             log::info!("Print help message");
@@ -77,14 +78,14 @@ async fn answer(
             )
             .await?;
 
-            if !con.has_business(&scraper.comp.company_id)? {
-                con.insert_business(scraper.comp.clone())?;
-                log::info!("Inserted Company in DB");
+            match con.insert_business(scraper.comp) {
+                Ok(_) => log::info!("Inserted Company in DB"),
+                Err(e) => log::error!("Could not insert Company in DB: {}", e),
             }
 
-            if !con.has_employee(&scraper.emp.emp_code)? {
-                con.insert_employee(scraper.emp.clone())?;
-                log::info!("Inserted Employee in DB");
+            match con.insert_employee(scraper.emp) {
+                Ok(_) => log::info!("Inserted Employee in DB"),
+                Err(e) => log::error!("Could not insert Employee in DB: {}", e),
             }
 
             let msg = match con.insert_receipt(scraper.receipt) {
