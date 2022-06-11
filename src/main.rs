@@ -1,4 +1,4 @@
-use teloxide::{prelude::*, utils::command::BotCommands};
+use teloxide::{prelude::*, types::ChatId, utils::command::BotCommands};
 
 use std::error::Error;
 
@@ -78,30 +78,8 @@ async fn answer(
             )
             .await?;
 
-            match con.insert_business(scraper.comp) {
-                Ok(_) => log::info!("Inserted Company in DB"),
-                Err(e) => log::error!("Could not insert Company in DB: {}", e),
-            }
-
-            match con.insert_employee(scraper.emp) {
-                Ok(_) => log::info!("Inserted Employee in DB"),
-                Err(e) => log::error!("Could not insert Employee in DB: {}", e),
-            }
-
-            let msg = match con.insert_receipt(scraper.receipt) {
-                Ok(_) => {
-                    log::info!("Inserted Receipt in DB");
-                    "Receipt added to database!"
-                },
-                Err(e) => {
-                    log::error!("Could not insert Receipt in DB: {}", e);
-                    "An error occured, and could not insert receipt :("
-                },
-            };
-
-            let a = bot
-                .send_message(message.chat.id, msg)
-                .await?;
+            let msg = insert_scraped_data(&url, &con, scraper);
+            let a = bot.send_message(message.chat.id, msg).await?;
             log::info!("Sent feedback message");
             a
         }
@@ -128,4 +106,31 @@ async fn answer(
     };
 
     Ok(())
+}
+
+fn insert_scraped_data(
+    url: &str,
+    con: &Database,
+    scraper: Scraper,
+) -> &'static str {
+    match con.insert_business(scraper.comp) {
+        Ok(_) => log::info!("Inserted Company in DB"),
+        Err(e) => log::error!("Could not insert Company in DB: {}", e),
+    }
+
+    match con.insert_employee(scraper.emp) {
+        Ok(_) => log::info!("Inserted Employee in DB"),
+        Err(e) => log::error!("Could not insert Employee in DB: {}", e),
+    }
+
+    match con.insert_receipt(scraper.receipt) {
+        Ok(_) => {
+            log::info!("Inserted Receipt in DB");
+            "Receipt added to database!"
+        }
+        Err(e) => {
+            log::error!("Could not insert Receipt in DB: {}", e);
+            "An error occured, and could not insert receipt :("
+        }
+    }
 }

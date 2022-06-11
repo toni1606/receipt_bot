@@ -140,18 +140,20 @@ impl Scraper {
                 .await?,
         );
 
-        let value: BigDecimal = BigDecimal::from_str(value
-            .replace("&nbsp;", "")
-            .replace(" LEK", "")
-            .replace(",", ".")
-            .trim())
-            .unwrap();
-        let tvsh: Option<BigDecimal> = match BigDecimal::from_str(tvsh
-            .replace("&nbsp;", "")
-            .replace(" LEK", "")
-            .replace(",", ".")
-            .trim())
-        {
+        let value: BigDecimal = BigDecimal::from_str(
+            value
+                .replace("&nbsp;", "")
+                .replace(" LEK", "")
+                .replace(",", ".")
+                .trim(),
+        )
+        .unwrap();
+        let tvsh: Option<BigDecimal> = match BigDecimal::from_str(
+            tvsh.replace("&nbsp;", "")
+                .replace(" LEK", "")
+                .replace(",", ".")
+                .trim(),
+        ) {
             Ok(o) => Some(o),
             Err(_) => None,
         };

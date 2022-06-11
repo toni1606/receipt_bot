@@ -4,7 +4,11 @@ use diesel::{
     Connection, MysqlConnection,
 };
 
-use crate::{models::Company, models::{User, Employee, Receipt}, schema::*};
+use crate::{
+    models::Company,
+    models::{Employee, Receipt, User},
+    schema::*,
+};
 
 pub struct Database {
     connection: MysqlConnection,
@@ -75,10 +79,7 @@ impl Database {
         use crate::schema::employee::dsl::*;
 
         diesel::insert_into(employee)
-            .values((
-                emp_code.eq(emp.emp_code),
-                comp_id.eq(emp.comp_id)
-            ))
+            .values((emp_code.eq(emp.emp_code), comp_id.eq(emp.comp_id)))
             .execute(&self.connection)
     }
 
@@ -112,7 +113,7 @@ impl Database {
                 status.eq(rec.status),
                 business_id.eq(rec.business_id),
                 operator_id.eq(rec.operator_id),
-                user_id.eq(rec.user_id)
+                user_id.eq(rec.user_id),
             ))
             .execute(&self.connection)
     }
