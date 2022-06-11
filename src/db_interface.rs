@@ -93,4 +93,27 @@ impl Database {
             _ => false,
         })
     }
+
+    pub fn insert_receipt(&self, rec: Receipt) -> QueryResult<usize> {
+        use crate::schema::receipt::dsl::*;
+
+        diesel::insert_into(receipt)
+            .values((
+                nslf.eq(rec.nslf),
+                nivf.eq(rec.nivf),
+                value_before_tvsh.eq(rec.value_before_tvsh),
+                tvsh.eq(rec.tvsh),
+                value.eq(rec.value),
+                location.eq(rec.location),
+                release_date.eq(rec.release_date),
+                receipt_type.eq(rec.receipt_type),
+                sw_code.eq(rec.sw_code),
+                payment_deadline.eq(rec.payment_deadline),
+                status.eq(rec.status),
+                business_id.eq(rec.business_id),
+                operator_id.eq(rec.operator_id),
+                user_id.eq(rec.user_id)
+            ))
+            .execute(&self.connection)
+    }
 }

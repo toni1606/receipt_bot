@@ -17,4 +17,4 @@ rqrr = "0.5.1"
 chrono = "0.4.19"
 scraper = "0.13.0"
 thirtyfour = { version = "0.29.1", features = ["native-tls"] }
-bigdecimal = "0.3.0"
+bigdecimal = "0.1.2"
