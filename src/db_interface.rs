@@ -4,7 +4,7 @@ use diesel::{
     Connection, MysqlConnection,
 };
 
-use crate::{models::User, schema::*};
+use crate::{models::User, schema::*, models::Company};
 
 pub struct Database {
     connection: MysqlConnection,
@@ -33,5 +33,14 @@ impl Database {
             .bind::<BigInt, _>(id)
             .bind::<Bool, _>(is_admin)
             .execute(&self.connection)
+    }
+
+    pub fn has_business(&self, id: i64) -> Result<bool, diesel::result::Error> {
+        let res = company::table.limit(1).load::<Company>(&self.connection)?;
+
+        Ok(match res.len() {
+            1 => true,
+            _ => false
+        })
     }
 }
