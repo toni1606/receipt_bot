@@ -1,5 +1,6 @@
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
+use bigdecimal::BigDecimal;
 use chrono::{NaiveDate, NaiveDateTime};
 use thirtyfour::prelude::*;
 
@@ -139,19 +140,17 @@ impl Scraper {
                 .await?,
         );
 
-        let value: f64 = value
+        let value: BigDecimal = BigDecimal::from_str(value
             .replace("&nbsp;", "")
             .replace(" LEK", "")
             .replace(",", ".")
-            .trim()
-            .parse()
+            .trim())
             .unwrap();
-        let tvsh: Option<f64> = match tvsh
+        let tvsh: Option<BigDecimal> = match BigDecimal::from_str(tvsh
             .replace("&nbsp;", "")
             .replace(" LEK", "")
             .replace(",", ".")
-            .trim()
-            .parse()
+            .trim())
         {
             Ok(o) => Some(o),
             Err(_) => None,
@@ -164,7 +163,7 @@ impl Scraper {
             "%d/%m/%Y %H:%M",
         )
         .unwrap();
-        let value_before_tvsh = Some(value - tvsh.unwrap_or(0.0));
+        let value_before_tvsh = Some(value.clone() - tvsh.clone().unwrap_or(BigDecimal::default()));
 
         Ok(Receipt {
             value,

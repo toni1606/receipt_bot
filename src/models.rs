@@ -3,9 +3,11 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
 use chrono::NaiveDateTime;
+
+use bigdecimal::BigDecimal;
 
 use crate::schema::receipt::{payment_deadline, value_before_tvsh};
 #[derive(Queryable, Debug, Clone)]
@@ -31,9 +33,9 @@ pub struct Employee {
 pub struct Receipt {
     pub nslf: String,
     pub nivf: String,
-    pub value_before_tvsh: Option<f64>,
-    pub tvsh: Option<f64>,
-    pub value: f64,
+    pub value_before_tvsh: Option<BigDecimal>,
+    pub tvsh: Option<BigDecimal>,
+    pub value: BigDecimal,
     pub location: Option<String>,
     pub release_date: NaiveDateTime,
     pub receipt_type: Option<String>,
@@ -60,9 +62,9 @@ impl Default for Receipt {
         Receipt {
             nslf: "".to_string(),
             nivf: "".to_string(),
-            value_before_tvsh: Some(0.0),
-            tvsh: Some(0.0),
-            value: 0.0,
+            value_before_tvsh: Some(BigDecimal::default()),
+            tvsh: Some(BigDecimal::default()),
+            value: BigDecimal::default(),
             location: Some("".to_string()),
             release_date: NaiveDateTime::from_timestamp(0, 0),
             receipt_type: Some("".to_string()),
