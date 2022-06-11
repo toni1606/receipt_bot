@@ -35,8 +35,11 @@ impl Database {
             .execute(&self.connection)
     }
 
-    pub fn has_business(&self, id: i64) -> Result<bool, diesel::result::Error> {
-        let res = company::table.limit(1).load::<Company>(&self.connection)?;
+    pub fn has_business(&self, id: &str) -> Result<bool, diesel::result::Error> {
+        let res = company::table
+                        .filter(company::columns::company_id.eq(id))
+                        .limit(1)
+                        .load::<Company>(&self.connection)?;
 
         Ok(match res.len() {
             1 => true,
