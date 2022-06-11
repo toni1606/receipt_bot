@@ -1,6 +1,6 @@
 use teloxide::{prelude::*, utils::command::BotCommands};
 
-use std::{error::Error, iter::Scan};
+use std::error::Error;
 
 use receipt_bot::{db_interface::*, web_scraper::Scraper};
 
