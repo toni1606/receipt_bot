@@ -4,7 +4,7 @@ use diesel::{
     Connection, MysqlConnection,
 };
 
-use crate::{models::User, schema::*, models::Company};
+use crate::{models::Company, models::User, schema::*};
 
 pub struct Database {
     connection: MysqlConnection,
@@ -37,13 +37,25 @@ impl Database {
 
     pub fn has_business(&self, id: &str) -> Result<bool, diesel::result::Error> {
         let res = company::table
-                        .filter(company::columns::company_id.eq(id))
-                        .limit(1)
-                        .load::<Company>(&self.connection)?;
+            .filter(company::columns::company_id.eq(id))
+            .limit(1)
+            .load::<Company>(&self.connection)?;
 
         Ok(match res.len() {
             1 => true,
-            _ => false
+            _ => false,
         })
+    }
+
+    pub fn insert_business(&self, comp: Company) -> Result<usize, diesel::result::Error> {
+        use crate::schema::company::dsl::*;
+
+        diesel::insert_into(company)
+            .values((
+                company_id.eq(comp.company_id),
+                location.eq(comp.location),
+                name.eq(comp.name),
+            ))
+            .execute(&self.connection)
     }
 }

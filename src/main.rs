@@ -68,10 +68,18 @@ async fn answer(
                 .await?
         }
         Command::InsertFromUrl(url) => {
-            let scraper = Scraper::new(&url, message.chat.id.to_string().parse().unwrap_or_else(|_|{
-                log::error!("message.chat.id () could not be parsed to i64");
-                0
-            })).await?;
+            let scraper = Scraper::new(
+                &url,
+                message.chat.id.to_string().parse().unwrap_or_else(|_| {
+                    log::error!("message.chat.id () could not be parsed to i64");
+                    0
+                }),
+            )
+            .await?;
+
+            if !con.has_business(&scraper.comp.company_id)? {
+                con.insert_business(scraper.comp.clone())?;
+            }
 
             let a = bot
                 .send_message(message.chat.id, format!("{scraper}"))

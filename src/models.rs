@@ -8,7 +8,7 @@ use std::fmt::Display;
 use chrono::NaiveDateTime;
 
 use crate::schema::receipt::{payment_deadline, value_before_tvsh};
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Clone)]
 // #[primary_key(company_id)]
 // #[table_name = "Company"]
 pub struct Company {
@@ -123,9 +123,7 @@ impl Display for Company {
     location: {:?},
     name: {:?}
 }}",
-            self.company_id,
-            self.location,
-            self.name
+            self.company_id, self.location, self.name
         )
     }
 }
@@ -138,8 +136,7 @@ impl Display for Employee {
     emp_code: {},
     comp_id: {}
 }}",
-            self.emp_code,
-            self.comp_id
+            self.emp_code, self.comp_id
         )
     }
 }
