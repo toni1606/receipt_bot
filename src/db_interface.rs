@@ -4,7 +4,7 @@ use diesel::{
     Connection, MysqlConnection,
 };
 
-use crate::{models::Company, models::{User, Employee}, schema::*};
+use crate::{models::Company, models::{User, Employee, Receipt}, schema::*};
 
 pub struct Database {
     connection: MysqlConnection,
@@ -80,5 +80,17 @@ impl Database {
                 comp_id.eq(emp.comp_id)
             ))
             .execute(&self.connection)
+    }
+
+    pub fn has_receipt(&self, rec: Receipt) -> QueryResult<bool> {
+        let res = receipt::table
+            .filter(receipt::columns::nivf.eq(rec.nivf))
+            .limit(1)
+            .load::<Receipt>(&self.connection)?;
+
+        Ok(match res.len() {
+            1 => true,
+            _ => false,
+        })
     }
 }

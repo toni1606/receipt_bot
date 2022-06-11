@@ -87,6 +87,8 @@ async fn answer(
                 log::info!("Inserted Employee in DB");
             }
 
+            if !con.has_receipt()
+
             let a = bot
                 .send_message(message.chat.id, format!("{scraper}"))
                 .await?;
