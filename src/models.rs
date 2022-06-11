@@ -17,7 +17,7 @@ pub struct Company {
     pub name: Option<String>,
 }
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Clone)]
 // #[primary_key(emp_code)]
 // #[table_name = "Employee"]
 pub struct Employee {

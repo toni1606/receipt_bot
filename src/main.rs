@@ -79,6 +79,12 @@ async fn answer(
 
             if !con.has_business(&scraper.comp.company_id)? {
                 con.insert_business(scraper.comp.clone())?;
+                log::info!("Inserted Company in DB");
+            }
+
+            if !con.has_employee(&scraper.emp.emp_code)? {
+                con.insert_employee(scraper.emp.clone())?;
+                log::info!("Inserted Employee in DB");
             }
 
             let a = bot
