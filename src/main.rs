@@ -87,12 +87,18 @@ async fn answer(
                 log::info!("Inserted Employee in DB");
             }
 
-            if !con.has_receipt()
+            let msg = match con.insert_receipt(scraper.receipt) {
+                Ok(_) => "Receipt added to database!",
+                Err(_) => {
+                    log::error!("Inserting receipt failed");
+                    "An error occured, and could not insert receipt :("
+                },
+            };
 
             let a = bot
-                .send_message(message.chat.id, format!("{scraper}"))
+                .send_message(message.chat.id, msg)
                 .await?;
-            log::info!("Sent Receipt back");
+            log::info!("Sent feedback message");
             a
         }
         Command::ShutDown => {
