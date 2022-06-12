@@ -1,7 +1,6 @@
 use teloxide::{
     dispatching::{update_listeners, UpdateFilterExt},
     prelude::*,
-    types::ChatId,
     utils::command::BotCommands,
 };
 
@@ -94,7 +93,7 @@ async fn answer(
             )
             .await?;
 
-            let msg = insert_scraped_data(&url, &con, scraper);
+            let msg = insert_scraped_data(&con, scraper);
             let a = bot.send_message(message.chat.id, msg).await?;
             log::info!("Sent feedback message");
             a
@@ -128,11 +127,19 @@ async fn answer_photo(
     bot: AutoSend<Bot>,
     message: Message,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    println!("MESSazh: {:?}, {:?}", message.text(), message.photo());
+    log::debug!("message.text(): {:?}, message.photo(): {:?}", message.text(), message.photo());
+
+    if let Some(p) = message.photo() {
+        let con = 
+            Database::connect(&std::env::var("DATABASE_URL")?).expect("Error while connecting to db");
+        log::info!("Succesful connection to Database");
+
+        
+    }
     Ok(())
 }
 
-fn insert_scraped_data(url: &str, con: &Database, scraper: Scraper) -> &'static str {
+fn insert_scraped_data(con: &Database, scraper: Scraper) -> &'static str {
     match con.insert_business(scraper.comp) {
         Ok(_) => log::info!("Inserted Company in DB"),
         Err(e) => log::error!("Could not insert Company in DB: {}", e),
