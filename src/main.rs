@@ -1,4 +1,4 @@
-use teloxide::{prelude::*, types::ChatId, utils::command::BotCommands};
+use teloxide::{prelude::*, types::ChatId, utils::command::BotCommands, dispatching::{UpdateFilterExt, update_listeners}};
 
 use std::error::Error;
 
@@ -26,7 +26,21 @@ async fn main() {
 
     let bot = Bot::from_env().auto_send();
 
-    teloxide::commands_repl(bot, answer, Command::ty()).await;
+    // teloxide::commands_repl(bot, answer, Command::ty()).await;
+    // teloxide::repl(bot, answer_photo).await;
+
+    Dispatcher::builder(
+        bot.clone(),
+        Update::filter_message().filter_command::<Command>().chain(dptree::endpoint(answer)).chain(dptree::endpoint(answer_photo))
+    )
+    .default_handler(|_upd| Box::pin(async {}))
+    .build()
+    .setup_ctrlc_handler()
+    .dispatch_with_listener(
+        update_listeners::polling_default(bot).await,
+        LoggingErrorHandler::with_custom_text("Custom error handler not working!"),
+    )
+    .await;
 }
 
 async fn answer(
@@ -38,7 +52,7 @@ async fn answer(
         &std::env::var("DATABASE_URL")?,
     )
     .expect("Error while connecting to db");
-    log::debug!("Connected to Database");
+    log::info!("Connected to Database");
 
     log::info!("Handling command");
     match command {
@@ -105,6 +119,14 @@ async fn answer(
         }
     };
 
+    Ok(())
+}
+
+async fn answer_photo(
+    bot: AutoSend<Bot>,
+    message: Message,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    println!("MESSazh: {:?}, {:?}", message.text(), message.photo());
     Ok(())
 }
 

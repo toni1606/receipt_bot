@@ -14,6 +14,8 @@ pub struct Scraper {
 
 impl Scraper {
     pub async fn new(url: &str, user_id: i64) -> WebDriverResult<Self> {
+        log::info!("Starting WebDriver");
+        
         let caps = DesiredCapabilities::firefox();
         let driver = WebDriver::new("http://localhost:4444", caps).await?;
 
