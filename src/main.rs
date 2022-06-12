@@ -145,7 +145,7 @@ async fn answer_photo(
         log::info!("Got file succesfully");
 
         let file_name = format!(
-            "/tmp/{}.png",
+            "./tmp/{}.jpg",
             std::time::SystemTime::now()
                 .duration_since(std::time::SystemTime::UNIX_EPOCH)
                 .unwrap()
@@ -164,8 +164,7 @@ async fn answer_photo(
                         log::error!("message.chat.id () could not be parsed to i64");
                         0
                     }),
-                )
-                .await?;
+                ).await?;
 
                 insert_scraped_data(&con, scraper)
             }
