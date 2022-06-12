@@ -1,4 +1,4 @@
-use rqrr::{PreparedImage, DeQRError};
+use rqrr::{DeQRError, PreparedImage};
 
 pub fn read_url_from_qr(path: &str) -> Result<String, Box<dyn std::error::Error>> {
     let img = image::open(path)?.to_luma8();
@@ -11,7 +11,7 @@ pub fn read_url_from_qr(path: &str) -> Result<String, Box<dyn std::error::Error>
         1 => {
             let (_, content) = grids[0].decode()?;
             Ok(content)
-        },
-        _ => Err(Box::new(DeQRError::DataUnderflow))
+        }
+        _ => Err(Box::new(DeQRError::DataUnderflow)),
     }
 }

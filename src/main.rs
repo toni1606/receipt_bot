@@ -1,12 +1,15 @@
 use teloxide::{
     dispatching::{update_listeners, UpdateFilterExt},
+    net::Download,
     prelude::*,
+    types::File,
     utils::command::BotCommands,
 };
+use tokio::fs::File as TFile;
 
 use std::error::Error;
 
-use receipt_bot::{db_interface::*, web_scraper::Scraper};
+use receipt_bot::{db_interface::*, qr_reader::read_url_from_qr, web_scraper::Scraper};
 
 #[derive(BotCommands, Clone)]
 #[command(rename = "lowercase", description = "These commands are supported:")]
@@ -127,15 +130,55 @@ async fn answer_photo(
     bot: AutoSend<Bot>,
     message: Message,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    log::debug!("message.text(): {:?}, message.photo(): {:?}", message.text(), message.photo());
+    log::debug!(
+        "message.text(): {:?}, message.photo(): {:?}",
+        message.text(),
+        message.photo()
+    );
 
     if let Some(p) = message.photo() {
-        let con = 
-            Database::connect(&std::env::var("DATABASE_URL")?).expect("Error while connecting to db");
+        let con = Database::connect(&std::env::var("DATABASE_URL")?)
+            .expect("Error while connecting to db");
         log::info!("Succesful connection to Database");
 
-        
+        let File { file_path, .. } = bot.get_file(p[0].file_id.clone()).send().await?;
+        log::info!("Got file succesfully");
+
+        let file_name = format!(
+            "/tmp/{}.png",
+            std::time::SystemTime::now()
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .unwrap()
+                .as_secs()
+        );
+
+        let mut file = TFile::create(&file_name).await?;
+
+        bot.download_file(&file_path, &mut file).await?;
+
+        let msg = match read_url_from_qr(&file_name) {
+            Ok(u) => {
+                let scraper = Scraper::new(
+                    &u,
+                    message.chat.id.to_string().parse().unwrap_or_else(|_| {
+                        log::error!("message.chat.id () could not be parsed to i64");
+                        0
+                    }),
+                )
+                .await?;
+
+                insert_scraped_data(&con, scraper)
+            }
+            Err(e) => {
+                log::error!("Invalid photo uploaded");
+                "The first photo you uploaded was not recognied as a qr code!"
+            }
+        };
+
+        bot.send_message(message.chat.id, msg).await?;
+        log::info!("Sent feedback message");
     }
+
     Ok(())
 }
 
