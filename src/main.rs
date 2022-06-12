@@ -1,4 +1,9 @@
-use teloxide::{prelude::*, types::ChatId, utils::command::BotCommands, dispatching::{UpdateFilterExt, update_listeners}};
+use teloxide::{
+    dispatching::{update_listeners, UpdateFilterExt},
+    prelude::*,
+    types::ChatId,
+    utils::command::BotCommands,
+};
 
 use std::error::Error;
 
@@ -26,19 +31,18 @@ async fn main() {
 
     let bot = Bot::from_env().auto_send();
 
-    // teloxide::commands_repl(bot, answer, Command::ty()).await;
-    // teloxide::repl(bot, answer_photo).await;
-
     Dispatcher::builder(
         bot.clone(),
-        Update::filter_message().filter_command::<Command>().chain(dptree::endpoint(answer)).chain(dptree::endpoint(answer_photo))
+        Update::filter_message()
+            .branch(dptree::entry().filter_command::<Command>().endpoint(answer))
+            .chain(dptree::endpoint(answer_photo)),
     )
     .default_handler(|_upd| Box::pin(async {}))
     .build()
     .setup_ctrlc_handler()
     .dispatch_with_listener(
         update_listeners::polling_default(bot).await,
-        LoggingErrorHandler::with_custom_text("Custom error handler not working!"),
+        LoggingErrorHandler::with_custom_text("Custom Dispatcher not working!"),
     )
     .await;
 }
@@ -48,10 +52,8 @@ async fn answer(
     message: Message,
     command: Command,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    let con = Database::connect(
-        &std::env::var("DATABASE_URL")?,
-    )
-    .expect("Error while connecting to db");
+    let con =
+        Database::connect(&std::env::var("DATABASE_URL")?).expect("Error while connecting to db");
     log::info!("Connected to Database");
 
     log::info!("Handling command");
@@ -130,11 +132,7 @@ async fn answer_photo(
     Ok(())
 }
 
-fn insert_scraped_data(
-    url: &str,
-    con: &Database,
-    scraper: Scraper,
-) -> &'static str {
+fn insert_scraped_data(url: &str, con: &Database, scraper: Scraper) -> &'static str {
     match con.insert_business(scraper.comp) {
         Ok(_) => log::info!("Inserted Company in DB"),
         Err(e) => log::error!("Could not insert Company in DB: {}", e),
