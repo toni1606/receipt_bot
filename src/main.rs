@@ -152,8 +152,10 @@ async fn answer_photo(
         );
 
         let mut file = TFile::create(&file_name).await?;
+        log::info!("created file with path: {}", &file_name);
 
         bot.download_file(&file_path, &mut file).await?;
+        log::info!("succesfuly downloaded file");
 
         let msg = match read_url_from_qr(&file_name) {
             Ok(u) => {
@@ -169,9 +171,12 @@ async fn answer_photo(
             }
             Err(e) => {
                 log::error!("Invalid photo uploaded");
-                "The first photo you uploaded was not recognied as a qr code!"
+                "The photo you uploaded was not recognied as a qr code!"
             }
         };
+
+        std::fs::remove_file(&file_name)?;
+        log::info!("removed temporary file");
 
         bot.send_message(message.chat.id, msg).await?;
         log::info!("Sent feedback message");
@@ -202,5 +207,3 @@ fn insert_scraped_data(con: &Database, scraper: Scraper) -> &'static str {
         }
     }
 }
-
-// impl<Func, Input, Output> Injectable<Input, Output, ()> for Asyncify<>
