@@ -131,8 +131,8 @@ async fn answer_photo(
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     log::debug!(
         "message.text(): {:?}, message.photo(): {:?}",
-        message.text(),
-        message.photo()
+        message.text().is_some(),
+        message.photo().is_some()
     );
 
     if let Some(p) = message.photo() {
@@ -140,7 +140,7 @@ async fn answer_photo(
             .expect("Error while connecting to db");
         log::info!("Succesful connection to Database");
 
-        let File { file_path, .. } = bot.get_file(p[0].file_id.clone()).send().await?;
+        let File { file_path, .. } = bot.get_file(p[p.len() - 1].file_id.clone()).send().await?;
         log::info!("Got file succesfully");
 
         let file_name = format!(
