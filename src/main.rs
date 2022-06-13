@@ -3,7 +3,7 @@ use teloxide::{
     net::Download,
     prelude::*,
     types::File,
-    utils::command::BotCommands,
+    utils::command::BotCommands, dptree::di::{Injectable, Asyncify},
 };
 use tokio::fs::File as TFile;
 
@@ -32,12 +32,11 @@ async fn main() {
     log::info!("Starting command bot...");
 
     let bot = Bot::from_env().auto_send();
-
     Dispatcher::builder(
         bot.clone(),
         Update::filter_message()
             .branch(dptree::entry().filter_command::<Command>().endpoint(answer))
-            .chain(dptree::endpoint(answer_photo)),
+            .chain(dptree::entry().endpoint(answer_photo)),
     )
     .default_handler(|_upd| Box::pin(async {}))
     .build()
@@ -203,3 +202,5 @@ fn insert_scraped_data(con: &Database, scraper: Scraper) -> &'static str {
         }
     }
 }
+
+// impl<Func, Input, Output> Injectable<Input, Output, ()> for Asyncify<>
