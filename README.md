@@ -21,7 +21,7 @@ Like other Rust project, you only need to run:
 
 The SQL code can be run to create the needed database (flavour is MySQL)
 
-```
+```mysql
 DROP SCHEMA IF EXISTS receipt;
 CREATE SCHEMA receipt;
 USE receipt;
